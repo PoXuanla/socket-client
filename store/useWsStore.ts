@@ -10,19 +10,32 @@ export const useWsStore = defineStore("ws", () => {
   const sendMsg = (msg: string) => {
     socket.value?.send(msg);
   };
+  const onopen = () => {
+    console.log("[open connection]");
+  };
+  const onmessage = (event: MessageEvent) => {
+    console.log(`[Message from server]:\n %c${event.data}`, "color: blue");
+  };
 
-  function connect() {
+  const onclose = () => console.log("[close connection]");
+
+  const connect = () => {
     // Create WebSocket connection
     // 在開啟連線時執行
     if (!socket.value) createSocket();
+
     console.log("[connecting...]");
-    socket.value!.onopen = () => console.log("[open connection]");
-  }
+
+    socket.value!.onopen = onopen;
+
+    socket.value!.onmessage = onmessage;
+
+    socket.value!.onclose = onclose;
+  };
 
   function disconnect() {
     if (socket.value) {
       socket.value.close();
-      socket.value.onclose = () => console.log("[close connection]");
     }
   }
 
